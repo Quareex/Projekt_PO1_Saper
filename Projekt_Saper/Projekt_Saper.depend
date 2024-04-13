@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1713019059 source:c:\users\ntt\onedrive\pulpit\projekt_saper\main.c
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+
