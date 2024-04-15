@@ -171,40 +171,34 @@ void generacja_bomb(char **plansza,int rozmiar, int bomby)
 //Funkcja wyswietlajaca graczowi plansze.
 void wyswietlenie_planszy(char **plansza, char **odkryta_plansza, int rozmiar)
 {
-    //zmienna przechowuje liczbe odstepow pomiedzy numerami kolumn.
-    int odstep_cyfry = 2;
-    //zmienna przechowujaca liczbe odstepow pomiedzy polami planszy.
-    int odstep_kropki = 3;
-
     //Funkcja czyszczaca poprzednio wyswietlona plansze.
     system("cls");
-
 
     printf("\n   ");
     for (int i = 0; i < rozmiar; i++)
         //Wyswietla numery kolumn.
-        printf("%*d ", odstep_cyfry, i);
+        printf("%*d ", 2, i);
 
     printf("\n");
 
     for (int i = 0; i < rozmiar; i++)
     {
         //Wyswietla numery wierszy
-        printf("%*d  ", odstep_cyfry, i);
+        printf("%*d  ", 2, i);
         for (int j = 0; j < rozmiar; j++)
         {
             if (odkryta_plansza[i][j])
             {
                 //Sprawdza czy pole jest odkryte i wyswietla odpowiadnia wartosc
                 if (odkryta_plansza[i][j] == 1)
-                    printf("%c%*c", plansza[i][j], odstep_kropki - 1, ' ');
+                    printf("%c%*c", plansza[i][j], 2, ' ');
                 //Sprawdza czy pole jest flaga. Jak tak to wyswietla f.
                 else if (odkryta_plansza[i][j] == 2)
-                    printf("f%*c", odstep_kropki - 1, ' ');
+                    printf("f%*c", 2, ' ');
             }
             else
                 //Wyswietla '.' gdy pole jest nieodkryte.
-                printf(".%*c", odstep_kropki - 1, ' ');
+                printf(".%*c", 2, ' ');
         }
         printf("\n");
     }
@@ -215,7 +209,7 @@ void wyswietlenie_planszy(char **plansza, char **odkryta_plansza, int rozmiar)
 //Funkcja odkrywajaca pola na planszy
 int odkrywanie_planszy(char** plansza, char** odkryta_plansza, int rozmiar, int rzad, int kolumna)
 {
-    //Sprawdza czy podana wspolrzedna nie jest ujemna i czy nie jest wieksza niz rozmiar planszy. Gdy zwraca 2 oznacza ze wspolrzedna jest nieprawidlowa.
+    //Sprawdza czy podane wspolrzedne nie sa ujemne i czy nie sa wieksze niz rozmiar planszy. Gdy zwraca 2 oznacza ze wspolrzedne sa nieprawidlowa.
     if (rzad < 0 || rzad >= rozmiar || kolumna < 0 || kolumna >= rozmiar || odkryta_plansza[rzad][kolumna])
         return 2;
 
@@ -228,7 +222,7 @@ int odkrywanie_planszy(char** plansza, char** odkryta_plansza, int rozmiar, int 
 
     if (plansza[rzad][kolumna] == '.')
     {
-        //zmienna do zliczania ile min znajduje sie w otoczeniu pola.
+        //zmienna przechowujaca ile min znajduje sie w otoczeniu pola.
         int k = 0;
         for (int i = rzad - 1; i <= rzad + 1; i++)
         {
@@ -248,13 +242,13 @@ int odkrywanie_planszy(char** plansza, char** odkryta_plansza, int rozmiar, int 
         }
     else
     {
-    //gdy nie ma min w otoczeniu to oznacza pole jako 0.
+    //gdy nie ma min w otoczeniu to oznacza pole jako znak '0'.
     plansza[rzad][kolumna] = '0';
     for (int i = rzad - 1; i <= rzad + 1; i++)
         for (int j = kolumna - 1; j <= kolumna + 1; j++)
             //Sprawdza czy pola mieszcza sie na planszy i czy pole zostalo odkryte.
             if (i >= 0 && i < rozmiar && j >= 0 && j < rozmiar && !odkryta_plansza[i][j])
-                //rekurencyjne wywoluje funkcje dla nieodkrytych pol bez min w okolicy.
+                //rekurencyjne wywoluje funkcje by sprawdzic pola w okolicy rekurencyjnie.
                 odkrywanie_planszy(plansza, odkryta_plansza, rozmiar, i, j);
     }
     }
@@ -286,7 +280,7 @@ void wybor_pola(char **plansza, char **odkryta_plansza, int rozmiar, int bomby, 
                 continue;
             }
 
-            //zmienna przechowujaca wynik dzialania funkcji odkrywanie_planszy(). -1 - mina, 0 - oznacza ze wokol pola sa miny, 1 - oznacza ze wokol pola nie ma min
+            //zmienna przechowujaca wynik dzialania funkcji odkrywanie_planszy(). -1 - mina, 0 - oznacza ze wokol pola sa miny, 1 - oznacza ze wokol pola nie ma min, 2 - zle wspolrzedne.
             int wynik = odkrywanie_planszy(plansza, odkryta_plansza, rozmiar, rzad, kolumna);
 
             //gdy wynik jest rowny -1 to gracz przegrywa.
@@ -324,14 +318,10 @@ void wybor_pola(char **plansza, char **odkryta_plansza, int rozmiar, int bomby, 
                 printf("Nieprawidlowe wspolrzedne. Podaj wartosci z zakresu od 0 do %d.\n", rozmiar - 1);
                 continue;
             }
-            //sprawdza czy pole nie jest juz odkryte lub czy nie ma na nim flagi.
+            //sprawdza czy pole jest rowne 0 (nie ma na sobie flagi i czy nie jest odkryte).
             if (!odkryta_plansza[rzad][kolumna])
-            {
-                //gdy pole nie jest odkryte to umieszcza na nim flage.
-                if (odkryta_plansza[rzad][kolumna] == 0)
                     odkryta_plansza[rzad][kolumna] = 2;
 
-            }
             else
                 printf("Nie mozna postawic flagi na odkrytym polu lub polu zawierajacym flage.\n");
 
@@ -364,7 +354,7 @@ void wybor_pola(char **plansza, char **odkryta_plansza, int rozmiar, int bomby, 
         if (ruch > 3)
             printf("Nieprawidlowy ruch. Podaj 1 by wybrac pole, 2 by postawic flage 3 by usunac flage.\n");
 
-        //sprawdza czy po wykonaniu przez gracza ruchu gra jest ju¿ wygrana poprzez funkcje sprawdz_wygrana().
+        //sprawdza czy po wykonaniu przez gracza ruchu gra jest juz wygrana poprzez funkcje sprawdz_wygrana().
         if (sprawdz_wygrana(plansza, odkryta_plansza, rozmiar, bomby))
         {
             printf("Gratulacje! Wygrales!");
