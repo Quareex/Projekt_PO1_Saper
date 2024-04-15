@@ -43,12 +43,14 @@ int main()
  return 0;
 }
 
-//Funkcja sprawdzajaca czy wymagania do wygrania gry sa spelnione (flagi na wszystkich minach i tylko na minach)
+//Funkcja sprawdzajaca czy wymagania do wygrania gry sa spelnione (flagi na wszystkich minach i tylko na minach oraz odkryc wszystkie puste pola)
 int sprawdz_wygrana(char **plansza, char **odkryta_plansza, int rozmiar, int bomby) {
     //zmienna przechowuje ilosc flag poprawnie ustawionych na polach z minami.
     int oznaczone_miny = 0;
     //zmienna przechowuje ile flag oznacza pola bez min.
     int zle_umieszczone_flagi = 0;
+    //zmienna przechowuje ilosc odkrytych pol
+    int odkryte_pola = 0;
 
     for (int i = 0; i < rozmiar; i++)
     {
@@ -60,11 +62,14 @@ int sprawdz_wygrana(char **plansza, char **odkryta_plansza, int rozmiar, int bom
             //if sprawdza czy wybrane pole nie jest mina i czy jego wartosc wynosi 2 (2 oznacza ze ustawiona jest tam flaga)
             if (plansza[i][j] != '*' && odkryta_plansza[i][j] == 2)
                 zle_umieszczone_flagi++;
+            //if sprawdza czy pole jest odkryte
+            if (plansza[i][j] != '*' && odkryta_plansza[i][j] == 1)
+                odkryte_pola++;
         }
     }
 
     //Funkcja zwraca 1 gdy spelniony jest warunek do wygrania gry i 0 gdy nie spelnia.
-    if (oznaczone_miny == bomby && zle_umieszczone_flagi == 0)
+    if (oznaczone_miny == bomby && zle_umieszczone_flagi == 0 && odkryte_pola == (rozmiar * rozmiar - bomby))
         return 1;
     else
         return 0;
@@ -114,7 +119,7 @@ char **alokacja_planszy(int rozmiar)
 //Funkcja do wyboru poziomu trudnosci gry.
 void wybor_trudnosci(int *a, int *b)
 {
-	puts("Wybierz poziom trudnosci:");
+	puts("Wybierz poziom trudnosci: ");
 	puts("1 - latwy  (plansza 8x8, 10 min)");
 	puts("2 - sredni (plansza 12x12, 25 min)");
 	puts("3 - trudny (plansza 16x16, 40 min)");
@@ -265,7 +270,12 @@ void wybor_pola(char **plansza, char **odkryta_plansza, int rozmiar, int bomby, 
         //zmienne rzad i kolumna przechowuja informacje o wybranym rzedzie i kolumnie a ruch o akcji jaka chce wykonac gracz.
         int rzad, kolumna, ruch;
         printf("Wybierz jaki ruch chcesz wykonac: 1 - wybor pola, 2 - postawienie flagi, 3 - usuniecie flagi. Ruch: ");
-        scanf("%d", &ruch);
+        if (scanf("%d", &ruch) != 1)
+        {
+            while (getchar() != '\n');
+            printf("Nieprawidlowy ruch. Podaj 1 by wybrac pole, 2 by postawic flage 3 by usunac flage.\n");
+            continue;
+        }
 
         //gdy gracz wybiera 1 wtedy moze wybrac pole na planszy do odkrycia
         if (ruch == 1)
